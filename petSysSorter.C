@@ -39,6 +39,7 @@ void petSysSorter::Loop()
 	cout << "Reading data from file: " << str << endl;
 
    Long64_t nentries = fChain->GetEntriesFast();
+   cout << nentries << " entires found in file" << endl;
 
 //	Int_t minMult=1;
 //
@@ -47,22 +48,22 @@ void petSysSorter::Loop()
 //	Long64_t tWindowArr[10]={20,100,200,1000,2000,10000,20000,100000,200000,1000000};
 //	Double_t tWindowLabels[10]={20,100,200,1000,2000,10000,20000,100000,200000,1000000};
 	
-	TH1I* qdc_h[256];
-	for(int i=0;i<256;i++) {
+	TH1I* qdc_h[512];
+	for(int i=0;i<512;i++) {
 		if(i<128) qdc_h[i]=new TH1I(Form("qdc%i_h",i),Form("QDC spectrum for chn %i",i),1100,-10,100);
-		else qdc_h[i]=new TH1I(Form("qdc%i_h",i+256),Form("QDC spectrum for chn %i",i+256),1100,-10,100);
+		else qdc_h[i]=new TH1I(Form("qdc%i_h",i+512),Form("QDC spectrum for chn %i",i+512),1100,-10,100);
 //		if(i<128) qdc_h[i]=new TH1I(Form("qdc%i_h",i),Form("QDC spectrum for chn %i",i),1500,-500,1000);
-//		else qdc_h[i]=new TH1I(Form("qdc%i_h",i+256),Form("QDC spectrum for chn %i",i+256),1500,-500,1000);
+//		else qdc_h[i]=new TH1I(Form("qdc%i_h",i+512),Form("QDC spectrum for chn %i",i+512),1500,-500,1000);
 	}
-//	TH1I* qdc2_h[256];
-//	for(int i=0;i<256;i++) {
+//	TH1I* qdc2_h[512];
+//	for(int i=0;i<512;i++) {
 //		if(i<128) qdc2_h[i]=new TH1I(Form("qdc2_%i_h",i),Form("QDC spectrum for chn %i",i),505,-10,1000);
-//		else qdc2_h[i]=new TH1I(Form("qdc2_%i_h",i+256),Form("QDC spectrum for chn %i",i+256),505,-10,1000);
+//		else qdc2_h[i]=new TH1I(Form("qdc2_%i_h",i+512),Form("QDC spectrum for chn %i",i+512),505,-10,1000);
 //	}
-	TH1I* tot_h[256];
-	for(int i=0;i<256;i++) {
+	TH1I* tot_h[512];
+	for(int i=0;i<512;i++) {
 		if(i<128) tot_h[i]=new TH1I(Form("tot%i_h",i),Form("TOT spectrum for chn %i",i),500,0,5e6);
-		else tot_h[i]=new TH1I(Form("tot%i_h",i+256),Form("TOT spectrum for chn %i",i+256),500,0,5e6);
+		else tot_h[i]=new TH1I(Form("tot%i_h",i+512),Form("TOT spectrum for chn %i",i+512),500,0,5e6);
 	}
 
 	TH2F* chnVsQDC_h = new TH2F("chnVsQDC_h","ChannelID vs. QDC value",550,-10,100,400,0,400);
@@ -73,14 +74,18 @@ void petSysSorter::Loop()
 	chnVsTOT_h->SetXTitle("TOT value");
 	chnVsTOT_h->SetYTitle("channelID");
 
-	TH1F* sumEnergyQDC_h = new TH1F("sumEnergyQDC_h",Form("Total Energy (QDC) for mult#geq%i",minMult),2200,-100,1000);
+	TH1F* simpleSumEnergyQDC_h = new TH1F("simpleSumEnergyQDC_h","Simple Sum of all Energy spectra (QDC)",2200,-20,200);
+	TH1F* sumEnergyQDC_h = new TH1F("sumEnergyQDC_h",Form("Total Energy (QDC) for mult#geq%i",minMult),2200,-20,200);
 //	TH1F* sumEnergyQDC_h = new TH1F("sumEnergyQDC_h",Form("Total Energy (QDC) for mult#geq%i",minMult),2000,-10000,1000);
 	TH1F* sumEnergyTOT_h = new TH1F("sumEnergyTOT_h",Form("Total Energy (TOT) for mult#geq%i",minMult),5500,-1e4,1e5);
 	TH1F* sumTOT_h = new TH1F("sumTOT_h",Form("Sum of TOT signals for mult#geq%i",minMult),5500,-3e6,3e7);
-	TH1I* mult_h = new TH1I("mult_h",Form("Number of SiPMs fired within time window (%.2f us)",tWindow*31e-12/1e-6),300,0,300);
-	mult_h->SetXTitle("# SiPMs");
-	TH1F* timeDiff_h = new TH1F("timeDiff_h","Time difference between consecutive entries",1100,-5,50);
-	timeDiff_h->SetXTitle("Time difference, us");
+//	TH1I* mult_h = new TH1I("mult_h",Form("Number of SiPMs fired within time window (%.2f us)",tWindow*31e-12/1e-6),300,0,300);
+	TH1I* mult_h = new TH1I("mult_h",Form("Number of SiPMs fired within time window (%.0f ns)",tWindow/1000.),300,0,300);
+	mult_h->SetXTitle("# pixels");
+	TH1F* timeDiff_h = new TH1F("timeDiff_h","Time difference between consecutive entries (ns)",1100,-50,500);
+	timeDiff_h->SetXTitle("Time difference, ns");
+//	TH1F* timeDiff2_h = new TH1F("timeDiff2_h","Time difference between consecutive entries (ns)",1001,-50,50000);
+//	timeDiff2_h->SetXTitle("Time difference, ns");
 
 	TH2F* sumQDCvsMult_h = new TH2F("sumQDCvsMult_h","Multiplicity vs. total energy (QDC)",1000,-100,1000,100,0,100);
 //	TH2F* sumQDCvsMult_h = new TH2F("sumQDCvsMult_h","Multiplicity vs. total energy (QDC)",1000,-10000,1000,100,0,100);
@@ -90,9 +95,10 @@ void petSysSorter::Loop()
 	sumTOTvsMult_h->SetYTitle("multiplicity");
 	sumTOTvsMult_h->SetXTitle("sum energy (TOT)");
 
-	TH2F* multVsTime_h = new TH2F("multVsTime_h","Multiplicity vs time window",10,0,10,100,0,300);
+	TH2F* multVsTime_h = new TH2F("multVsTime_h","Multiplicity vs time window",10,0,10,300,0,300);
 	multVsTime_h->SetXTitle("Coincidnce Time Window, ns");
-	for(int i=0;i<10;i++) multVsTime_h->GetXaxis()->SetBinLabel(i+1,Form("%.2f",tWindowArr[i]*31.e-12/1e-9));
+//	for(int i=0;i<10;i++) multVsTime_h->GetXaxis()->SetBinLabel(i+1,Form("%.2f",tWindowArr[i]*31.e-12/1e-9));
+	for(int i=0;i<10;i++) multVsTime_h->GetXaxis()->SetBinLabel(i+1,Form("%.2f",tWindowArr[i]/1000.));
 
 	TH2I* coincPlot_h = new TH2I("coincPlot_h","Coincidence Plot of largest energies",550,-10,100,550,-10,100);
 	coincPlot_h->SetXTitle("energy");
@@ -119,11 +125,11 @@ void petSysSorter::Loop()
 	Int_t mult=0;
 	Int_t multArr[10]={0,0,0,0,0,0,0,0,0,0};
 	
-	Float_t energyList[256];
-	Int_t chnArray[256];
-	Int_t hitList[256];
-	Int_t sortList[256];
-	for(int i=0;i<256;i++) {
+	Float_t energyList[512];
+	Int_t chnArray[512];
+	Int_t hitList[512];
+	Int_t sortList[512];
+	for(int i=0;i<512;i++) {
 		energyList[i]=0;
 		chnArray[i]=0;
 		hitList[i]=0;
@@ -134,14 +140,17 @@ void petSysSorter::Loop()
 	Int_t prevChn=0;
 
    Long64_t nbytes = 0, nb = 0;
-   for (Long64_t jentry=0; jentry<nentries;jentry++) {
+	Long64_t jentry=0;
+//	nentries=100;
+	for (jentry=0; jentry<nentries;jentry++) {
+		if(jentry!=0 && jentry%1000==0) cout << jentry << " enties processed \r" << flush;
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
-       if (Cut(ientry) < 0) continue;
+//       if (Cut(ientry) < 0) continue;
        
       timeDiff=time-tmpTime;
-      if(timeDiff<=tWindow) { // good coincidense
+      if(timeDiff<=tWindow) { // good coincidence
 			sumEnergy+=energy;
 			sumTOT+=tot;
 			mult++;
@@ -152,8 +161,8 @@ void petSysSorter::Loop()
 //			chnArray[mult-1]=channelID;
 			hitList[mult-1]=channelID;
 			
-		} else { // not good coincidense
-		// Fill histograms
+		} else { // not good coincidence
+// Fill histograms
 			if(mult>=minMult) {
 				sumEnergyQDC_h->Fill(sumEnergy);
 				sumTOT_h->Fill(sumTOT);
@@ -163,20 +172,19 @@ void petSysSorter::Loop()
 			sumTOTvsMult_h->Fill(sumEnergy,mult);
 			mult_h->Fill(mult);
 			
-			TMath::Sort(256,energyList,sortList);
+			TMath::Sort(512,energyList,sortList);
 			coincPlot_h->Fill(energyList[sortList[1]],energyList[sortList[0]]);
 			coincPlot_h->Fill(energyList[sortList[0]],energyList[sortList[1]]);
 			chnCorrelation3_h->Fill(sortList[1],sortList[0]);
 			chnCorrelation3_h->Fill(sortList[0],sortList[1]);
 			if(energyList[21]!=0&&energyList[22]!=0) coincPlot_21_22_h->Fill(energyList[21],energyList[22]);
 
-// Zeros arrays
+// Zero arrays
 			for(int i=0;i<mult;i++) {
 				energyList[hitList[i]]=0;
 				hitList[i]=0;
 			}
 // Write next entry to temporary variables
-
 			energyList[channelID]=energy;
 //			chnArray[0]=channelID;
 			hitList[0]=channelID;
@@ -203,34 +211,40 @@ void petSysSorter::Loop()
 
 		chnVsQDC_h->Fill(energy,channelID);
 		chnVsTOT_h->Fill(tot,channelID);
+		simpleSumEnergyQDC_h->Fill(energy);
 		if(channelID<128) {
 			qdc_h[channelID]->Fill(energy);
 			tot_h[channelID]->Fill(tot);
 		}
-		if(channelID>=256) {
+		if(channelID>=512) {
 			qdc_h[channelID-128]->Fill(energy);
 			tot_h[channelID-128]->Fill(tot);
 		}
 		intTime_h->Fill(tot/1000);
 		hitPattern_h->Fill(channelID);
-		timeDiff_h->Fill((time-prevTime)*31e-12/1e-6);
+//		timeDiff_h->Fill((time-prevTime)*31e-12/1e-6);
+		timeDiff_h->Fill((time-prevTime)*1e-3); // in nanoseconds
+//		timeDiff2_h->Fill((time-prevTime)*1e-3); // in nanoseconds
 //      if(time<tmpTime) cout << "Smaller" << endl;
 //      tmpTime=time;
 		prevTime=time;
 		prevChn=channelID;
-				
+		
    } // end of loop over entries
+   cout << jentry << " enties processed \n";
    
    TCanvas* qdcMode_c=new TCanvas("qdcMode_c","QDC mode");
    qdcMode_c->Divide(2,2);
    qdcMode_c->cd(1);
    sumEnergyQDC_h->Draw();
    qdcMode_c->cd(2);
-   sumQDCvsMult_h->Draw("colz");
-	qdcMode_c->cd(3);
-	chnVsQDC_h->Draw("colz");
+   simpleSumEnergyQDC_h->Draw();
+   qdcMode_c->cd(3);
+	sumQDCvsMult_h->Draw("colz");
 	qdcMode_c->cd(4);
-	intTime_h->Draw();
+	chnVsQDC_h->Draw("colz");
+//	qdcMode_c->cd(4);
+//	intTime_h->Draw();
 	
 	TCanvas* totMode_c=new TCanvas("totMode_c","TOT mode");
    totMode_c->Divide(2,2);
@@ -250,12 +264,13 @@ void petSysSorter::Loop()
    timeDiff_h->Draw();
    mult_c->cd(2);
    mult_c->GetPad(2)->SetLogy(1);
-   mult_h->Draw();
+//   timeDiff2_h->Draw();
    mult_c->cd(3);
    multVsTime_h->SetStats(0);
-   multVsTime_h->Draw("colz");
+   mult_h->Draw();
    mult_c->cd(4);
-   intTime_h->Draw();
+   multVsTime_h->Draw("colz");
+//   intTime_h->Draw();
    
    TCanvas* hitPatt_c=new TCanvas("hitPatt_c","Hit patterns etc.");
    hitPatt_c->Divide(2,2);
@@ -268,7 +283,7 @@ void petSysSorter::Loop()
    chnCorrelation2_h->SetStats(0);
    chnCorrelation2_h->Draw("colz");
 
-	TCanvas* coinc_c=new TCanvas("coinc_c","Coincidense plots");
+	TCanvas* coinc_c=new TCanvas("coinc_c","coincidence plots");
 	coinc_c->Divide(2,2);
 	coinc_c->cd(1);
 	chnCorrelation3_h->Draw("colz");
@@ -302,11 +317,12 @@ void petSysSorter::Loop()
    TFile* outFile = new TFile(str,"recreate");
 	cout << "Outputting to file: " << str << endl;
    sumEnergyQDC_h->Write();
+   simpleSumEnergyQDC_h->Write();
    sumTOT_h->Write();
    sumEnergyTOT_h->Write();
    chnVsQDC_h->Write();
    chnVsTOT_h->Write();
-//   for(int i=0;i<256;i++) {
+//   for(int i=0;i<512;i++) {
 //		qdc_h[i]->Write();
 //		tot_h[i]->Write();
 //	}
@@ -374,7 +390,7 @@ void run(TString string)
 	sumEnergyTOT_h->Write();
 	chnVsQDC_h->Write();
 	chnVsTOT_h->Write();
-//   for(int i=0;i<256;i++) {
+//   for(int i=0;i<512;i++) {
 //		qdc_h[i]->Write();
 //		tot_h[i]->Write();
 //	}

@@ -26,9 +26,9 @@ public :
 // Fixed size dimensions of array or collections stored in the TTree if any.
 
    // Declaration of leaf types
-   Float_t         step1;
-   Float_t         step2;
-   Long64_t        time;
+   Float_t         step1;	// value of parameter 1 (when doing parameter scans)
+   Float_t         step2;	// value of parameter 2 (when doing parameter scans)
+   Long64_t        time;	// time of event, in picoseconds
    UInt_t          channelID;
    Float_t         tot;
    Float_t         energy;
@@ -38,7 +38,7 @@ public :
    Float_t         x;
    Float_t         y;
    Float_t         z;
-   Float_t         tqT;
+   Float_t         tqT;	// the fine timing of the chn (crossing time threshold), in TDC clock units (200 MHz => 5ns
    Float_t         tqE;
 
    // List of branches
@@ -72,10 +72,14 @@ public :
 
 	Int_t minMult=2;
 
-	Long64_t tWindow=1e5; // 3.1us
+	Double_t tWindow=100000; // in picoseconds
+
+//	Long64_t tWindow=1e5; // 3.1us. I think these units are wrong
 //	Long64_t tWindow=3e5; // 9.3us
-	Long64_t tWindowArr[10]={20,100,200,1000,2000,10000,20000,100000,200000,1000000};
-	Double_t tWindowLabels[10]={20,100,200,1000,2000,10000,20000,100000,200000,1000000};
+//	Long64_t tWindowArr[10]={20,100,200,1000,2000,10000,20000,100000,200000,1000000};
+//	Double_t tWindowLabels[10]={20,100,200,1000,2000,10000,20000,100000,200000,1000000};
+	Double_t tWindowArr[10]={1000,5000,10000,20000,50000,100000,500000,1000000,2000000,10000000};
+//	Double_t tWindowLabels[10]={20,100,200,1000,2000,10000,20000,100000,200000,1000000};
 ///////////////////////////
 
 // Histograms //
@@ -234,9 +238,9 @@ Int_t petSysSorter::Cut(Long64_t entry)
 // returns  1 if entry is accepted.
 // returns -1 otherwise.
 
-	if(step1==20 && step2==20)   return 1;
-	else return -1;
+//	if(step1==20 && step2==20)   return 1;
+//	else return -1;
 	
-//	return 1;
+	return 1;
 }
 #endif // #ifdef petSysSorter_cxx
