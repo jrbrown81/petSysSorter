@@ -163,7 +163,7 @@ void petSysSorter::Loop()
 //	nentries=100;
 // Loop over entries in tree
 	for (jentry=0; jentry<nentries;jentry++) {
-		if(jentry!=0 && jentry%1000==0) cout << jentry << " enties processed \r" << flush;
+		if(jentry!=0 && jentry%10000==0) cout << jentry << " enties processed \r" << flush;
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
@@ -409,10 +409,12 @@ void petSysSorter::Loop()
 		tot_h[i+128]->Draw();
 	}
    
+   TString codeDir=gSystem->pwd();
+   
    TString str2=fChain->GetCurrentFile()->GetName();
    str2.ReplaceAll(".root","_out");
    gSystem->MakeDirectory(str2);
-   gSystem->cd(str2);
+//   gSystem->cd(str2);
    str.ReplaceAll(".root","_out.root");
    TFile* outFile = new TFile(str,"recreate");
 	cout << "Outputting to file: " << str << endl;
@@ -439,16 +441,8 @@ void petSysSorter::Loop()
 	hitMap_h->Write();
 	TCanvas* tmp_c=new TCanvas("tmp_c");
 	TString str3;
-   for(int i=0;i<100; i++) {
-		evtMap_h[i]->Write();
-		evtMap_h[i]->SetStats(0);
-		evtMap_h[i]->Draw("colz");
-		str3=evtMap_h[i]->GetName();
-		str3.Append(".pdf");
-		tmp_c->SaveAs(str3,"pdf");
-	}
-   qdcMode_c->Write();
    totMode_c->Write();
+
    mult_c->Write();
    timeWindowTest_c->Write();
    sumTests_c->Write();
@@ -458,6 +452,40 @@ void petSysSorter::Loop()
    qdc_c2->Write();
    tot_c1->Write();
    tot_c2->Write();
+ 
+   gSystem->cd(str2);
+   str3=totMode_c->GetName();
+   str3.Append(".png");
+   totMode_c->SaveAs(str3,"png");
+   str3=mult_c->GetName();
+   str3.Append(".png");
+   mult_c->SaveAs(str3,"png");
+   str3=sumTests_c->GetName();
+   str3.Append(".png");
+   sumTests_c->SaveAs(str3,"png");
+   str3=hitPatt_c->GetName();
+   str3.Append(".png");
+   hitPatt_c->SaveAs(str3,"png");
+   str3=coinc_c->GetName();
+   str3.Append(".png");
+   coinc_c->SaveAs(str3,"png");
+   str3=qdc_c1->GetName();
+   str3.Append(".png");
+   qdc_c1->SaveAs(str3,"png");
+   str3=qdc_c2->GetName();
+   str3.Append(".png");
+   qdc_c2->SaveAs(str3,"png");
+
+   for(int i=0;i<100; i++) {
+		evtMap_h[i]->Write();
+		evtMap_h[i]->SetStats(0);
+		evtMap_h[i]->Draw("colz");
+		str3=evtMap_h[i]->GetName();
+		str3.Append(".png");
+		tmp_c->SaveAs(str3,"png");
+	}
+   qdcMode_c->Write();
+   gSystem->cd(codeDir);
    outFile->Close();
    delete qdcMode_c;
    delete totMode_c;
