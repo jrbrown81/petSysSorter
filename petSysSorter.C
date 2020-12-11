@@ -5,7 +5,7 @@
 //#include <TCanvas.h>
 //#include <iostream>
 
-void petSysSorter::Loop()
+void petSysSorter::Loop(Int_t toProcess=0)
 {
 //	cout << "Switching to Batch mode" << endl;
 //	gROOT->SetBatch(1);
@@ -40,9 +40,14 @@ void petSysSorter::Loop()
 
    Long64_t nentries = fChain->GetEntriesFast();
    cout << nentries << " entires found in file" << endl;
+   if(toProcess!=0) {
+      nentries = toProcess;
+      cout << "Processing " << nentries << " entries" << endl;
+   }
+   else cout << "Processing all entries" << endl;
 
-	TH1I* qdc_h[512];
-	for(int i=0;i<512;i++) {
+   TH1I* qdc_h[512];
+   for(int i=0;i<512;i++) {
 		if(i<128) qdc_h[i]=new TH1I(Form("qdc%i_h",i),Form("QDC spectrum for chn %i",i),1100,-10,100);
 		else qdc_h[i]=new TH1I(Form("qdc%i_h",i+512),Form("QDC spectrum for chn %i",i+512),1100,-10,100);
 	}
@@ -452,6 +457,10 @@ void petSysSorter::Loop()
    qdc_c2->Write();
    tot_c1->Write();
    tot_c2->Write();
+   for(int i=0;i<128;i++) {
+      qdc_h[i]->Write();
+      qdc_h[i+128]->Write();
+   }
  
    gSystem->cd(str2);
    str3=totMode_c->GetName();
@@ -505,7 +514,7 @@ void petSysSorter::Loop()
 //   cout << "Return to normal mode" << endl;
 }
 
-void run(TString string)
+void run(TString string, Int_t toProcess=0)
 {
 	TFile f1(string);
 	TTree* tree;
@@ -516,7 +525,7 @@ void run(TString string)
 	
 	cout << "Switching to Batch mode" << endl;
 	gROOT->SetBatch(1);
-	pss.Loop();
+	pss.Loop(toProcess);
 	gROOT->SetBatch(0);
 	cout << "Return to normal mode" << endl;
 
