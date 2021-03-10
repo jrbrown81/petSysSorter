@@ -48,24 +48,30 @@ void petSysSorter::Loop(Int_t toProcess=0)
 
    TH1I* qdc_h[512];
    for(int i=0;i<512;i++) {
-		if(i<128) qdc_h[i]=new TH1I(Form("qdc%i_h",i),Form("QDC spectrum for chn %i",i),1100,-10,100);
-		else qdc_h[i]=new TH1I(Form("qdc%i_h",i+512),Form("QDC spectrum for chn %i",i+512),1100,-10,100);
+      qdc_h[i]=new TH1I(Form("qdc%i_h",i),Form("QDC spectrum for chn %i",i),1100,-10,100);
+//		if(i<128) qdc_h[i]=new TH1I(Form("qdc%i_h",i),Form("QDC spectrum for chn %i",i),1000,-400,100);
+//		else qdc_h[i]=new TH1I(Form("qdc%i_h",i+512),Form("QDC spectrum for chn %i",i+512),1000,-400,100);
+		//if(i<128) qdc_h[i]=new TH1I(Form("qdc%i_h",i),Form("QDC spectrum for chn %i",i),1100,-10,100);
+		//else qdc_h[i]=new TH1I(Form("qdc%i_h",i+512),Form("QDC spectrum for chn %i",i+512),1100,-10,100);
 	}
-	TH1I* tot_h[512];
-	for(int i=0;i<512;i++) {
-		if(i<128) tot_h[i]=new TH1I(Form("tot%i_h",i),Form("TOT spectrum for chn %i",i),500,0,5e6);
-		else tot_h[i]=new TH1I(Form("tot%i_h",i+512),Form("TOT spectrum for chn %i",i+512),500,0,5e6);
-	}
+//	TH1I* tot_h[512];
+//	for(int i=0;i<512;i++) {
+//		if(i<128) tot_h[i]=new TH1I(Form("tot%i_h",i),Form("TOT spectrum for chn %i",i),500,0,5e6);
+//		else tot_h[i]=new TH1I(Form("tot%i_h",i+512),Form("TOT spectrum for chn %i",i+512),500,0,5e6);
+//	}
 
-	TH2F* chnVsQDC_h = new TH2F("chnVsQDC_h","ChannelID vs. QDC value",550,-10,100,400,0,400);
+	TH2F* chnVsQDC_h = new TH2F("chnVsQDC_h","ChannelID vs. QDC value",550,-10,100,512,0,512);
 	chnVsQDC_h->SetXTitle("QDC value");
 	chnVsQDC_h->SetYTitle("channelID");
-	TH2F* chnVsTOT_h = new TH2F("chnVsTOT_h","ChannelID vs. TOT value",550,-1e6,1e7,400,0,400);
-	chnVsTOT_h->SetXTitle("TOT value");
-	chnVsTOT_h->SetYTitle("channelID");
+//	TH2F* chnVsTOT_h = new TH2F("chnVsTOT_h","ChannelID vs. TOT value",550,-1e6,1e7,512,0,512);
+//	chnVsTOT_h->SetXTitle("TOT value");
+//	chnVsTOT_h->SetYTitle("channelID");
 
 	TH1F* simpleSumEnergyQDC_h = new TH1F("simpleSumEnergyQDC_h","Simple Sum of all Energy spectra (QDC)",2200,-20,200);
+	//TH1F* simpleSumEnergyQDC_h = new TH1F("simpleSumEnergyQDC_h","Simple Sum of all Energy spectra (QDC)",2200,-20,200);
 	TH1F* sumEnergyQDC_h = new TH1F("sumEnergyQDC_h",Form("Total Energy (QDC) for mult#geq%i",minMult),2200,-20,200);
+	//TH1F* sumEnergyQDC_h = new TH1F("sumEnergyQDC_h",Form("Total Energy (QDC) for mult#geq%i",minMult),2200,-20,200);
+//	TH1F* sumEnergyQDC2_h = new TH1F("sumEnergyQDC2_h",Form("Total Energy (QDC) for mult#geq%i and pixel energy #leq%.1f",minMult,minEnergy),2200,-2000,200);
 	TH1F* sumEnergyQDC2_h = new TH1F("sumEnergyQDC2_h",Form("Total Energy (QDC) for mult#geq%i and pixel energy #geq%.1f",minMult,minEnergy),2200,-20,200);
 	
 	TH1F* sumEnergyTOT_h = new TH1F("sumEnergyTOT_h",Form("Total Energy (TOT) for mult#geq%i",minMult),5500,-1e4,1e5);
@@ -103,10 +109,11 @@ void petSysSorter::Loop(Int_t toProcess=0)
 	coincPlot_21_22_h->SetXTitle("energy (chn21)");
 	coincPlot_21_22_h->SetYTitle("energy (chn22)");
 
-	TH2I* chnCorrelation1_h = new TH2I("chnCorrelation1_h","Channel correlation plot (first vs current)",400,0,400,400,0,400);
-	TH2I* chnCorrelation2_h = new TH2I("chnCorrelation2_h","Channel correlation plot (previous vs current)",400,0,400,400,0,400);
-	TH2I* chnCorrelation3_h = new TH2I("chnCorrelation3_h","Channel correlation plot (largest energies)",400,0,400,400,0,400);
-	TH1I* hitPattern_h = new TH1I("hitPattern_h","Channel hit pattern",400,0,400);
+   TH2I* chnCorrelationAll_h = new TH2I("chnCorrelationAll_h","Channel correlation plot (all)",512,0,512,512,0,512);
+	TH2I* chnCorrelation1_h = new TH2I("chnCorrelation1_h","Channel correlation plot (first vs current)",512,0,512,512,0,512);
+	TH2I* chnCorrelation2_h = new TH2I("chnCorrelation2_h","Channel correlation plot (previous vs current)",512,0,512,512,0,512);
+	TH2I* chnCorrelation3_h = new TH2I("chnCorrelation3_h","Channel correlation plot (largest energies)",512,0,512,512,0,512);
+	TH1I* hitPattern_h = new TH1I("hitPattern_h","Channel hit pattern",512,0,512);
 	
 	TH2I* hitMap_h = new TH2I("hitMap_h","Hit map (all events)",16,0,53.76,16,0,53.76);
 	hitMap_h->GetXaxis()->SetTitle("x (mm)");
@@ -199,6 +206,8 @@ void petSysSorter::Loop(Int_t toProcess=0)
 			sumQDCvsMult_h->Fill(sumEnergy,mult);
 			sumTOTvsMult_h->Fill(sumEnergy,mult);
 			mult_h->Fill(mult);
+   
+         for(int i=0;i<mult-1;i++) for(int j=i+1;j<mult;j++) chnCorrelationAll_h->Fill(hitList[i],hitList[j]);
 			
 			TMath::Sort(512,energyList,sortList);
 //			for(int i=0;i<mult;i++) {
@@ -261,16 +270,17 @@ void petSysSorter::Loop(Int_t toProcess=0)
 ////////////
 
 		chnVsQDC_h->Fill(energy,channelID);
-		chnVsTOT_h->Fill(tot,channelID);
+//		chnVsTOT_h->Fill(tot,channelID);
 		simpleSumEnergyQDC_h->Fill(energy);
-		if(channelID<128) {
-			qdc_h[channelID]->Fill(energy);
-			tot_h[channelID]->Fill(tot);
-		}
-		if(channelID>=512) {
-			qdc_h[channelID-128]->Fill(energy);
-			tot_h[channelID-128]->Fill(tot);
-		}
+      qdc_h[channelID]->Fill(energy);
+//		if(channelID<128) {
+//			qdc_h[channelID]->Fill(energy);
+//			tot_h[channelID]->Fill(tot);
+//		}
+//		if(channelID>=512) {
+//			qdc_h[channelID-128]->Fill(energy);
+//			tot_h[channelID-128]->Fill(tot);
+//		}
 		intTime_h->Fill(tot/1000);
 		hitPattern_h->Fill(channelID);
 		
@@ -280,12 +290,24 @@ void petSysSorter::Loop(Int_t toProcess=0)
 		} else if(channelID<128) {
 			hitMap_h->Fill(arraySize-pixelX[channelID-64],2*arraySize-pixelY[channelID-64]);
 			if(event<100) evtMap_h[event]->Fill(arraySize-pixelX[channelID-64],2*arraySize-pixelY[channelID-64],energy);
-		} else if(channelID>=256 && channelID<320) {
+		} else if(channelID<192) {
+         hitMap_h->Fill(arraySize-pixelX[channelID-128],2*arraySize-pixelY[channelID-128]);
+         if(event<100) evtMap_h[event]->Fill(arraySize-pixelX[channelID-128],2*arraySize-pixelY[channelID-128],energy);
+      } else if(channelID<256) {
+         hitMap_h->Fill(arraySize-pixelX[channelID-192],2*arraySize-pixelY[channelID-192]);
+         if(event<100) evtMap_h[event]->Fill(arraySize-pixelX[channelID-192],2*arraySize-pixelY[channelID-192],energy);
+      } else if(channelID<320) {
 			hitMap_h->Fill(arraySize+pixelX[channelID-256],pixelY[channelID-256]);
 			if(event<100) evtMap_h[event]->Fill(arraySize+pixelX[channelID-256],pixelY[channelID-256],energy);
 		} else if(channelID<384) {
 			hitMap_h->Fill(2*arraySize-pixelX[channelID-320],2*arraySize-pixelY[channelID-320]);
 			if(event<100) evtMap_h[event]->Fill(2*arraySize-pixelX[channelID-320],2*arraySize-pixelY[channelID-320],energy);
+      } else if(channelID<448) {
+         hitMap_h->Fill(arraySize+pixelX[channelID-384],pixelY[channelID-384]);
+         if(event<100) evtMap_h[event]->Fill(arraySize+pixelX[channelID-384],pixelY[channelID-384],energy);
+      } else if(channelID<512) {
+         hitMap_h->Fill(2*arraySize-pixelX[channelID-448],2*arraySize-pixelY[channelID-448]);
+         if(event<100) evtMap_h[event]->Fill(2*arraySize-pixelX[channelID-448],2*arraySize-pixelY[channelID-448],energy);
 		}
 //		else if(channelID<128) hitMap_h->Fill(pixelX[channelID-64]+arraySize,pixelY[channelID-64]);
 //		else if(channelID>=256 && channelID<320) hitMap_h->Fill(pixelX[channelID-256],pixelY[channelID-256]+arraySize);
@@ -316,16 +338,16 @@ void petSysSorter::Loop(Int_t toProcess=0)
 	chnVsQDC_h->SetStats(0);
 	chnVsQDC_h->Draw("colz");
 	
-	TCanvas* totMode_c=new TCanvas("totMode_c","TOT mode");
-   totMode_c->Divide(2,2);
-   totMode_c->cd(1);
-   sumEnergyTOT_h->Draw();
-   totMode_c->cd(2);
-   sumTOTvsMult_h->Draw("colz");
-	totMode_c->cd(3);
-	chnVsTOT_h->Draw("colz");
-	totMode_c->cd(4);
-   sumTOT_h->Draw();
+//	TCanvas* totMode_c=new TCanvas("totMode_c","TOT mode");
+//   totMode_c->Divide(2,2);
+//   totMode_c->cd(1);
+//   sumEnergyTOT_h->Draw();
+//   totMode_c->cd(2);
+//   sumTOTvsMult_h->Draw("colz");
+//	totMode_c->cd(3);
+//	chnVsTOT_h->Draw("colz");
+//	totMode_c->cd(4);
+//   sumTOT_h->Draw();
 
    TCanvas* mult_c=new TCanvas("mult_c","Timing and multiplicity plots");
    mult_c->Divide(2,2);
@@ -371,7 +393,8 @@ void petSysSorter::Loop(Int_t toProcess=0)
    chnCorrelation2_h->Draw("colz");
    hitPatt_c->cd(4);
    hitMap_h->SetStats(0);
-   hitMap_h->Draw("colz");
+   chnCorrelationAll_h->Draw("colz");
+//   hitMap_h->Draw("colz");
 //   chnMap_h->Draw("text same");
 
 	TCanvas* coinc_c=new TCanvas("coinc_c","coincidence plots");
@@ -393,6 +416,10 @@ void petSysSorter::Loop(Int_t toProcess=0)
    qdc_c1->Divide(16,8);
    TCanvas* qdc_c2=new TCanvas("qdc_c2","QDC plots 2");
    qdc_c2->Divide(16,8);
+   TCanvas* qdc_c3=new TCanvas("qdc_c3","QDC plots 3");
+   qdc_c3->Divide(16,8);
+   TCanvas* qdc_c4=new TCanvas("qdc_c4","QDC plots 4");
+   qdc_c4->Divide(16,8);
 	for(int i=0;i<128;i++) {
 		qdc_c1->cd(i+1);
 		qdc_c1->GetPad(i+1)->SetLogy(1);
@@ -400,19 +427,25 @@ void petSysSorter::Loop(Int_t toProcess=0)
 		qdc_c2->cd(i+1);
 		qdc_c2->GetPad(i+1)->SetLogy(1);
 		qdc_h[i+128]->Draw();
+      qdc_c3->cd(i+1);
+      qdc_c3->GetPad(i+1)->SetLogy(1);
+      qdc_h[i+256]->Draw();
+      qdc_c4->cd(i+1);
+      qdc_c4->GetPad(i+1)->SetLogy(1);
+      qdc_h[i+384]->Draw();
 	}
-	TCanvas* tot_c1=new TCanvas("tot_c1","TOT plots 1");
-   tot_c1->Divide(16,8);
-   TCanvas* tot_c2=new TCanvas("tot_c2","TOT plots 2");
-   tot_c2->Divide(16,8);
-	for(int i=0;i<128;i++) {
-		tot_c1->cd(i+1);
-		tot_c1->GetPad(i+1)->SetLogy(1);
-		tot_h[i]->Draw();
-		tot_c2->cd(i+1);
-		tot_c2->GetPad(i+1)->SetLogy(1);
-		tot_h[i+128]->Draw();
-	}
+//	TCanvas* tot_c1=new TCanvas("tot_c1","TOT plots 1");
+//   tot_c1->Divide(16,8);
+//   TCanvas* tot_c2=new TCanvas("tot_c2","TOT plots 2");
+//   tot_c2->Divide(16,8);
+//	for(int i=0;i<128;i++) {
+//		tot_c1->cd(i+1);
+//		tot_c1->GetPad(i+1)->SetLogy(1);
+//		tot_h[i]->Draw();
+//		tot_c2->cd(i+1);
+//		tot_c2->GetPad(i+1)->SetLogy(1);
+//		tot_h[i+128]->Draw();
+//	}
    
    TString codeDir=gSystem->pwd();
    
@@ -428,7 +461,7 @@ void petSysSorter::Loop(Int_t toProcess=0)
    sumTOT_h->Write();
    sumEnergyTOT_h->Write();
    chnVsQDC_h->Write();
-   chnVsTOT_h->Write();
+//   chnVsTOT_h->Write();
 
    mult_h->Write();
    intTime_h->Write();
@@ -446,7 +479,7 @@ void petSysSorter::Loop(Int_t toProcess=0)
 	hitMap_h->Write();
 	TCanvas* tmp_c=new TCanvas("tmp_c");
 	TString str3;
-   totMode_c->Write();
+//   totMode_c->Write();
 
    mult_c->Write();
    timeWindowTest_c->Write();
@@ -455,17 +488,20 @@ void petSysSorter::Loop(Int_t toProcess=0)
    coinc_c->Write();
    qdc_c1->Write();
    qdc_c2->Write();
-   tot_c1->Write();
-   tot_c2->Write();
-   for(int i=0;i<128;i++) {
-      qdc_h[i]->Write();
-      qdc_h[i+128]->Write();
-   }
+   qdc_c3->Write();
+   qdc_c4->Write();
+//   tot_c1->Write();
+//   tot_c2->Write();
+//   for(int i=0;i<128;i++) {
+//      qdc_h[i]->Write();
+//      qdc_h[i+128]->Write();
+//   }
+//   for(int i=0;i<512;i++) qdc_h[i]->Write();
  
    gSystem->cd(str2);
-   str3=totMode_c->GetName();
-   str3.Append(".png");
-   totMode_c->SaveAs(str3,"png");
+//   str3=totMode_c->GetName();
+//   str3.Append(".png");
+//   totMode_c->SaveAs(str3,"png");
    str3=mult_c->GetName();
    str3.Append(".png");
    mult_c->SaveAs(str3,"png");
@@ -484,9 +520,18 @@ void petSysSorter::Loop(Int_t toProcess=0)
    str3=qdc_c2->GetName();
    str3.Append(".png");
    qdc_c2->SaveAs(str3,"png");
+   str3=qdc_c3->GetName();
+   str3.Append(".png");
+   qdc_c3->SaveAs(str3,"png");
+   str3=qdc_c4->GetName();
+   str3.Append(".png");
+   qdc_c4->SaveAs(str3,"png");
+   str3=qdcMode_c->GetName();
+   str3.Append(".png");
+   qdcMode_c->SaveAs(str3,"png");
 
    for(int i=0;i<100; i++) {
-		evtMap_h[i]->Write();
+//		evtMap_h[i]->Write();
 		evtMap_h[i]->SetStats(0);
 		evtMap_h[i]->Draw("colz");
 		str3=evtMap_h[i]->GetName();
@@ -497,7 +542,7 @@ void petSysSorter::Loop(Int_t toProcess=0)
    gSystem->cd(codeDir);
    outFile->Close();
    delete qdcMode_c;
-   delete totMode_c;
+//   delete totMode_c;
    delete mult_c;
    delete timeWindowTest_c;
    delete sumTests_c;
@@ -505,8 +550,10 @@ void petSysSorter::Loop(Int_t toProcess=0)
    delete coinc_c;
    delete qdc_c1;
    delete qdc_c2;
-   delete tot_c1;
-   delete tot_c2;
+   delete qdc_c3;
+   delete qdc_c4;
+//   delete tot_c1;
+//   delete tot_c2;
 
 //	save(step1,step2);
 

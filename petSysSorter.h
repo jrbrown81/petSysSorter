@@ -70,7 +70,8 @@ public :
 // Some global variables //
 //	TString *str;
 
-	Int_t minMult=5;
+	Int_t minMult=0;
+//	Int_t minMult=30;
 	Float_t minEnergy=1;
 
 	Double_t tWindow=100000; // in picoseconds
