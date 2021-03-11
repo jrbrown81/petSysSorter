@@ -5,7 +5,7 @@
 //#include <TCanvas.h>
 //#include <iostream>
 
-void petSysSorter::Loop(Int_t toProcess=0)
+void petSysSorter::Loop(Int_t toProcess=0, Bool_t hitMaps=0)
 {
 //	cout << "Switching to Batch mode" << endl;
 //	gROOT->SetBatch(1);
@@ -45,14 +45,47 @@ void petSysSorter::Loop(Int_t toProcess=0)
       cout << "Processing " << nentries << " entries" << endl;
    }
    else cout << "Processing all entries" << endl;
+   
+   Int_t port[512];
+   for(int i=0;i<512;i++) {
+      if(i<128) port[i]=ports[0];
+      else if(i<256) port[i]=ports[1];
+      else if(i<384) port[i]=ports[2];
+      else if(i<512) port[i]=ports[3];
+   }
+   Float_t chnX[512];
+   Float_t chnY[512];
+   for(int i=0;i<512;i++) {
+      if(i<64) {
+         chnX[i]=arraySize*(port[i])-pixelX[i];
+         chnY[i]=pixelY[i];
+      } else if(i<128) {
+         chnX[i]=arraySize*(port[i]-1)+pixelX[i-64];;
+         chnY[i]=2*arraySize-pixelY[i-64];
+      } else if(i<192) {
+         chnX[i]=arraySize*(port[i])-pixelX[i-128];
+         chnY[i]=pixelY[i-128];
+      } else if(i<256) {
+         chnX[i]=arraySize*(port[i]-1)+pixelX[i-192];
+         chnY[i]=2*arraySize-pixelY[i-192];
+      } else if(i<320) {
+         chnX[i]=arraySize*(port[i])-pixelX[i-256];
+         chnY[i]=pixelY[i-256];
+      } else if(i<384) {
+         chnX[i]=arraySize*(port[i]-1)+pixelX[i-320];
+         chnY[i]=2*arraySize-pixelY[i-320];
+      } else if(i<448) {
+         chnX[i]=arraySize*(port[i])-pixelX[i-384];
+         chnY[i]=pixelY[i-384];
+      } else if(i<512) {
+         chnX[i]=arraySize*(port[i]-1)+pixelX[i-448];
+         chnY[i]=2*arraySize-pixelY[i-448];
+      }
+   }
 
    TH1I* qdc_h[512];
    for(int i=0;i<512;i++) {
       qdc_h[i]=new TH1I(Form("qdc%i_h",i),Form("QDC spectrum for chn %i",i),1100,-10,100);
-//		if(i<128) qdc_h[i]=new TH1I(Form("qdc%i_h",i),Form("QDC spectrum for chn %i",i),1000,-400,100);
-//		else qdc_h[i]=new TH1I(Form("qdc%i_h",i+512),Form("QDC spectrum for chn %i",i+512),1000,-400,100);
-		//if(i<128) qdc_h[i]=new TH1I(Form("qdc%i_h",i),Form("QDC spectrum for chn %i",i),1100,-10,100);
-		//else qdc_h[i]=new TH1I(Form("qdc%i_h",i+512),Form("QDC spectrum for chn %i",i+512),1100,-10,100);
 	}
 //	TH1I* tot_h[512];
 //	for(int i=0;i<512;i++) {
@@ -120,24 +153,21 @@ void petSysSorter::Loop(Int_t toProcess=0)
 	hitMap_h->GetYaxis()->SetTitle("y (mm)");
 	
 	TH2F* evtMap_h[100];
-	for(int i=0;i<100;i++) {
-		evtMap_h[i] = new TH2F(Form("evtMap_h_%i",i),Form("Hit map (event %i)",i),16,0,53.76,16,0,53.76);
-		evtMap_h[i]->GetXaxis()->SetTitle("x (mm)");
-		evtMap_h[i]->GetYaxis()->SetTitle("y (mm)");
-		evtMap_h[i]->GetZaxis()->SetTitle("energy");
+   if(hitMaps) {
+      for(int i=0;i<100;i++) {
+         evtMap_h[i] = new TH2F(Form("evtMap_h_%i",i),Form("Hit map (event %i)",i),16,0,53.76,16,0,53.76);
+         evtMap_h[i]->GetXaxis()->SetTitle("x (mm)");
+         evtMap_h[i]->GetYaxis()->SetTitle("y (mm)");
+         evtMap_h[i]->GetZaxis()->SetTitle("energy");
+      }
 	}
-	
-	TH2I* chnMap_h = new TH2I("chnMap_h","Channel map",16,0,53.76,16,0,53.76);
-	for(int i=0;i<256;i++) {
-		if(i<64) chnMap_h->Fill(pixelX[i],pixelY[i],i);
-		else if(i<128) chnMap_h->Fill(arraySize-pixelX[i-64],2*arraySize-pixelY[i-64],i);
-		else if(i<192) chnMap_h->Fill(arraySize+pixelX[i-128],pixelY[i-128],i);
-		else if(i<256) chnMap_h->Fill(2*arraySize-pixelX[i-192],2*arraySize-pixelY[i-192],i);
-	//		else if(i<128) chnMap_h->Fill(pixelX[i-64]+arraySize,pixelY[i-64],i);
-	//		else if(i<192) chnMap_h->Fill(pixelX[i-128],pixelY[i-128]+arraySize,i);
-	//		else if(i<256) chnMap_h->Fill(pixelX[i-192]+arraySize,pixelY[i-192]+arraySize,i);
-	}
-	
+   TH2I* chnMap_h = new TH2I("chnMap_h","Channel map",16,0,53.76,16,0,53.76);
+   TH2I* portMap_h = new TH2I("portMap_h","Port map",16,0,53.76,16,0,53.76);
+   for(int i=0;i<512;i++) if(port[i]!=0) {
+      chnMap_h->Fill(chnX[i],chnY[i],i);
+      portMap_h->Fill(chnX[i],chnY[i],port[i]);
+   }
+   
 	TH1F* intTime_h = new TH1F("intTime_h","Integration time (QDC mode only)",1000,0,2.5e3);
 	intTime_h->SetXTitle("Integration time, ns");
 	
@@ -225,13 +255,6 @@ void petSysSorter::Loop(Int_t toProcess=0)
 				if(energyList[21]!=0&&energyList[22]!=0) coincPlot_21_22_h->Fill(energyList[21],energyList[22]);
 			}
 			
-//			if(event<100) {
-//				if(channelID<64) evtMap_h[event]->Fill(pixelX[channelID],pixelY[channelID]);
-//				else if(channelID<128) evtMap_h[event]->Fill(arraySize-pixelX[channelID-64],2*arraySize-pixelY[channelID-64]);
-//				else if(channelID>=256 && channelID<320) evtMap_h[event]->Fill(arraySize+pixelX[channelID-256],pixelY[channelID-256]);
-//				else if(channelID<384) evtMap_h[event]->Fill(2*arraySize-pixelX[channelID-320],2*arraySize-pixelY[channelID-320]);
-//			}
-
 // Zero arrays
 			for(int i=0;i<mult;i++) {
 				energyList[hitList[i]]=0;
@@ -273,45 +296,12 @@ void petSysSorter::Loop(Int_t toProcess=0)
 //		chnVsTOT_h->Fill(tot,channelID);
 		simpleSumEnergyQDC_h->Fill(energy);
       qdc_h[channelID]->Fill(energy);
-//		if(channelID<128) {
-//			qdc_h[channelID]->Fill(energy);
-//			tot_h[channelID]->Fill(tot);
-//		}
-//		if(channelID>=512) {
-//			qdc_h[channelID-128]->Fill(energy);
-//			tot_h[channelID-128]->Fill(tot);
-//		}
+//      tot_h[channelID]->Fill(tot);
 		intTime_h->Fill(tot/1000);
 		hitPattern_h->Fill(channelID);
 		
-		if(channelID<64) {
-			hitMap_h->Fill(pixelX[channelID],pixelY[channelID]);
-			if(event<100) evtMap_h[event]->Fill(pixelX[channelID],pixelY[channelID],energy);
-		} else if(channelID<128) {
-			hitMap_h->Fill(arraySize-pixelX[channelID-64],2*arraySize-pixelY[channelID-64]);
-			if(event<100) evtMap_h[event]->Fill(arraySize-pixelX[channelID-64],2*arraySize-pixelY[channelID-64],energy);
-		} else if(channelID<192) {
-         hitMap_h->Fill(arraySize-pixelX[channelID-128],2*arraySize-pixelY[channelID-128]);
-         if(event<100) evtMap_h[event]->Fill(arraySize-pixelX[channelID-128],2*arraySize-pixelY[channelID-128],energy);
-      } else if(channelID<256) {
-         hitMap_h->Fill(arraySize-pixelX[channelID-192],2*arraySize-pixelY[channelID-192]);
-         if(event<100) evtMap_h[event]->Fill(arraySize-pixelX[channelID-192],2*arraySize-pixelY[channelID-192],energy);
-      } else if(channelID<320) {
-			hitMap_h->Fill(arraySize+pixelX[channelID-256],pixelY[channelID-256]);
-			if(event<100) evtMap_h[event]->Fill(arraySize+pixelX[channelID-256],pixelY[channelID-256],energy);
-		} else if(channelID<384) {
-			hitMap_h->Fill(2*arraySize-pixelX[channelID-320],2*arraySize-pixelY[channelID-320]);
-			if(event<100) evtMap_h[event]->Fill(2*arraySize-pixelX[channelID-320],2*arraySize-pixelY[channelID-320],energy);
-      } else if(channelID<448) {
-         hitMap_h->Fill(arraySize+pixelX[channelID-384],pixelY[channelID-384]);
-         if(event<100) evtMap_h[event]->Fill(arraySize+pixelX[channelID-384],pixelY[channelID-384],energy);
-      } else if(channelID<512) {
-         hitMap_h->Fill(2*arraySize-pixelX[channelID-448],2*arraySize-pixelY[channelID-448]);
-         if(event<100) evtMap_h[event]->Fill(2*arraySize-pixelX[channelID-448],2*arraySize-pixelY[channelID-448],energy);
-		}
-//		else if(channelID<128) hitMap_h->Fill(pixelX[channelID-64]+arraySize,pixelY[channelID-64]);
-//		else if(channelID>=256 && channelID<320) hitMap_h->Fill(pixelX[channelID-256],pixelY[channelID-256]+arraySize);
-//		else if(channelID<384) hitMap_h->Fill(pixelX[channelID-320]+arraySize,pixelY[channelID-320]+arraySize);
+      hitMap_h->Fill(chnX[channelID],chnY[channelID]);
+      if(hitMaps && event<100) evtMap_h[event]->Fill(chnX[channelID],chnY[channelID],energy);
 
 		timeDiff_h->Fill((time-prevTime)*1e-3); // in nanoseconds
 		prevTime=time;
@@ -394,8 +384,6 @@ void petSysSorter::Loop(Int_t toProcess=0)
    hitPatt_c->cd(4);
    hitMap_h->SetStats(0);
    chnCorrelationAll_h->Draw("colz");
-//   hitMap_h->Draw("colz");
-//   chnMap_h->Draw("text same");
 
 	TCanvas* coinc_c=new TCanvas("coinc_c","coincidence plots");
 	coinc_c->Divide(2,2);
@@ -476,6 +464,7 @@ void petSysSorter::Loop(Int_t toProcess=0)
    chnCorrelation3_h->Write();
    hitPattern_h->Write();
    chnMap_h->Write();
+   portMap_h->Write();
 	hitMap_h->Write();
 	TCanvas* tmp_c=new TCanvas("tmp_c");
 	TString str3;
@@ -530,14 +519,16 @@ void petSysSorter::Loop(Int_t toProcess=0)
    str3.Append(".png");
    qdcMode_c->SaveAs(str3,"png");
 
-   for(int i=0;i<100; i++) {
-//		evtMap_h[i]->Write();
-		evtMap_h[i]->SetStats(0);
-		evtMap_h[i]->Draw("colz");
-		str3=evtMap_h[i]->GetName();
-		str3.Append(".png");
-		tmp_c->SaveAs(str3,"png");
-	}
+   if(hitMaps) {
+      for(int i=0;i<100; i++) {
+   //		evtMap_h[i]->Write();
+         evtMap_h[i]->SetStats(0);
+         evtMap_h[i]->Draw("colz");
+         str3=evtMap_h[i]->GetName();
+         str3.Append(".png");
+         tmp_c->SaveAs(str3,"png");
+      }
+   }
    qdcMode_c->Write();
    gSystem->cd(codeDir);
    outFile->Close();
@@ -561,7 +552,7 @@ void petSysSorter::Loop(Int_t toProcess=0)
 //   cout << "Return to normal mode" << endl;
 }
 
-void run(TString string, Int_t toProcess=0)
+void run(TString string, Int_t toProcess=0, Bool_t hitMaps=0)
 {
 	TFile f1(string);
 	TTree* tree;
@@ -569,10 +560,10 @@ void run(TString string, Int_t toProcess=0)
 	if(tree) cout << "data tree found in file: " << string << endl;
 	else cout << "Error!" << endl;
 	petSysSorter pss(tree);
-	
+  
 	cout << "Switching to Batch mode" << endl;
 	gROOT->SetBatch(1);
-	pss.Loop(toProcess);
+	pss.Loop(toProcess,hitMaps);
 	gROOT->SetBatch(0);
 	cout << "Return to normal mode" << endl;
 

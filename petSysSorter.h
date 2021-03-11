@@ -63,7 +63,7 @@ public :
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
    virtual void     Init(TTree *tree);
-   virtual void     Loop(Int_t toProcess);
+   virtual void     Loop(Int_t toProcess, Bool_t hitMaps);
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
 
@@ -71,25 +71,21 @@ public :
 //	TString *str;
 
 	Int_t minMult=0;
-//	Int_t minMult=30;
 	Float_t minEnergy=1;
 
 	Double_t tWindow=100000; // in picoseconds
 
-//	Long64_t tWindow=1e5; // 3.1us. I think these units are wrong
-//	Long64_t tWindow=3e5; // 9.3us
-//	Long64_t tWindowArr[10]={20,100,200,1000,2000,10000,20000,100000,200000,1000000};
-//	Double_t tWindowLabels[10]={20,100,200,1000,2000,10000,20000,100000,200000,1000000};
 	Double_t tWindowArr[10]={1000,5000,10000,20000,50000,100000,500000,1000000,2000000,10000000};
-//	Double_t tWindowLabels[10]={20,100,200,1000,2000,10000,20000,100000,200000,1000000};
 ///////////////////////////
-
+// Specify the location of each FEM, e.g. {1,0,2,0,0,0,0,0} means FEMs connected to ports 1 and 3 are side by side, no other FEMs in use
+   Int_t ports[8]={1,2,0,0,0,0,0,0};
 
 	Float_t arraySize=26.88;
 	Float_t pixelX[64] = { 25.18,21.82,15.1,21.82,18.46,25.18,15.1,21.82,18.46,11.74,25.18,15.1,21.82,	18.46,25.18,15.1,21.82,25.18,25.18,21.82,25.18,21.82,21.82,25.18,15.1,18.46,15.1,18.46,	18.46,18.46,15.1,15.1,18.46,11.74,8.38,8.38,11.74,8.38,8.38,11.74,8.38,11.74,1.66,	5.02,1.66,5.02,5.02,1.66,1.66,5.02,11.74,1.66,5.02,5.02,1.66,1.66,5.02,8.38,	8.38,11.74,1.66,8.38,11.74,5.02
 	};
 	Float_t pixelY[64] = { 21.82,21.82,18.46,25.18,25.18,15.1,25.18,18.46,21.82,15.1,25.18,15.1,15.1,18.46,18.46,	21.82,5.02,1.66,5.02,1.66,11.74,11.74,8.38,8.38,1.66,1.66,5.02,15.1,5.02,8.38,8.38,11.74,	11.74,11.74,11.74,8.38,8.38,5.02,15.1,5.02,1.66,1.66,11.74,11.74,8.38,5.02,8.38,5.02,1.66,	1.66,25.18,15.1,15.1,18.46,18.46,21.82,21.82,25.18,18.46,21.82,25.18,21.82,18.46,25.18
 	};
+ 
 };
 
 #endif
@@ -179,6 +175,17 @@ Bool_t petSysSorter::Notify()
    
 //   str=fChain->GetCurrentFile()->GetName();
 //	cout << "Reading data from file: " << str << endl;
+
+   for(int i=0;i<7;i++) {
+      if(ports[i]!=0) for(int j=i+1;j<8;j++) if(ports[i]==ports[j]) {
+         cout << "------------Warning!-------------\n";
+         cout << "Multiple FEMs are assigned to the same position.\n";
+         cout << "Check 'ports[]' in 'petSysSorter.h'\n";
+         cout << "This will mess up any hit maps\n";
+         cout << "---------------------------------" << endl;
+         return kFALSE;
+      }
+   }
 
    return kTRUE;
 }
