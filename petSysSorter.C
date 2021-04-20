@@ -170,6 +170,19 @@ void petSysSorter::Loop(Int_t toProcess=0, Bool_t hitMaps=0)
    
 	TH1F* intTime_h = new TH1F("intTime_h","Integration time (QDC mode only)",1000,0,2.5e3);
 	intTime_h->SetXTitle("Integration time, ns");
+ 
+   TH1F* regionSpec_h[6];
+   TH2I* regionMap_h[6];
+   for(int i=0;i<6;i++) {
+       regionSpec_h[i] = new TH1F(Form("regionSpec%i_h",i),Form("Energy spectrum for region %i",i),2200,-20,200);
+       regionMap_h[i] = new TH2I(Form("regionMap%i_h",i),Form("Region map for region %i",i),16,0,53.76,16,0,53.76);
+   }
+   TH2I* maxPixelMap_h = new TH2I("maxPixelMap_h","Hit map of highest energy pixel per event",16,0,53.76,16,0,53.76);
+   maxPixelMap_h->GetXaxis()->SetTitle("x (mm)");
+   maxPixelMap_h->GetYaxis()->SetTitle("y (mm)");
+
+   Float_t maxE=0;
+   Int_t maxPix=-100;
 	
 	Long64_t prevTime=0;
 	Long64_t tmpTime=0;
@@ -215,6 +228,10 @@ void petSysSorter::Loop(Int_t toProcess=0, Bool_t hitMaps=0)
 //      if(timeDiff<0) cout << jentry << endl;
       if(timeDiff<=tWindow) { // good coincidence
 			sumEnergy+=energy;
+         if(energy>maxE) {
+            maxPix=channelID;
+            maxE=energy;
+         }
 			if(energy>minEnergy) sumEnergy2+=energy;
 			sumTOT+=tot;
 			mult++;
@@ -254,7 +271,21 @@ void petSysSorter::Loop(Int_t toProcess=0, Bool_t hitMaps=0)
 				chnCorrelation3_h->Fill(sortList[0],sortList[1]);
 				if(energyList[21]!=0&&energyList[22]!=0) coincPlot_21_22_h->Fill(energyList[21],energyList[22]);
 			}
-			
+
+// Fill region spectra
+         Int_t region;
+         if(maxPix<64) region=0;
+         else if(maxPix<128) region=1;
+         else if(maxPix<320) region=2;
+         else if(maxPix<384) region=3;
+         regionSpec_h[region]->Fill(sumEnergy);
+         regionMap_h[region]->Fill(chnX[maxPix],chnY[maxPix]);
+         if(maxPix==60 || maxPix==63 || maxPix==64 || maxPix==65 || maxPix==67 || maxPix==74 || maxPix==266 || maxPix==375 || maxPix==380) region=4;
+         else region=5;
+         regionSpec_h[region]->Fill(sumEnergy);
+         regionMap_h[region]->Fill(chnX[maxPix],chnY[maxPix]);
+         maxPixelMap_h->Fill(chnX[maxPix],chnY[maxPix]);
+         
 // Zero arrays
 			for(int i=0;i<mult;i++) {
 				energyList[hitList[i]]=0;
@@ -272,6 +303,10 @@ void petSysSorter::Loop(Int_t toProcess=0, Bool_t hitMaps=0)
 			mult=1;
 			tmpTime=time;
 			tmpChn=channelID;
+
+         maxE=energy;
+         maxPix=channelID;
+         
 			event++;
 		}
       
@@ -486,6 +521,12 @@ void petSysSorter::Loop(Int_t toProcess=0, Bool_t hitMaps=0)
 //      qdc_h[i+128]->Write();
 //   }
 //   for(int i=0;i<512;i++) qdc_h[i]->Write();
+
+   for(int i=0;i<6;i++) {
+      regionSpec_h[i]->Write();
+      regionMap_h[i]->Write();
+   }
+   maxPixelMap_h->Write();
  
    gSystem->cd(str2);
 //   str3=totMode_c->GetName();
@@ -568,6 +609,28 @@ void run(TString string, Int_t toProcess=0, Bool_t hitMaps=0)
 	cout << "Return to normal mode" << endl;
 
 	delete tree;
+}
+
+
+void Usage()
+{
+   cout << "run('filename',toProcess,hitMaps)" << endl;
+   cout << "Provide 'filename' with extention \n";
+   cout << "Specify number of entries to process (enter 0 for all events).\n";
+   cout << "To save hitMaps of first 100 events set 'hitMaps=1'.\n";
+   cout << "Options 'toProcess' and 'hitMaps' may be omitted." << endl;
+}
+void usage()
+{
+   Usage();
+}
+void help()
+{
+   Usage();
+}
+void Help()
+{
+   Usage();
 }
 
 /*int save(Float_t step1,Float_t step2)
