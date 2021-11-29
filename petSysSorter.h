@@ -15,6 +15,7 @@
 #include <TStyle.h>
 #include <TCanvas.h>
 #include <iostream>
+#include <TSystem.h>
 
 // Header file for the classes stored in the TTree if any.
 
@@ -22,7 +23,7 @@ class petSysSorter {
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
-	
+
 // Fixed size dimensions of array or collections stored in the TTree if any.
 
    // Declaration of leaf types
@@ -85,7 +86,7 @@ public :
 	};
 	Float_t pixelY[64] = { 21.82,21.82,18.46,25.18,25.18,15.1,25.18,18.46,21.82,15.1,25.18,15.1,15.1,18.46,18.46,	21.82,5.02,1.66,5.02,1.66,11.74,11.74,8.38,8.38,1.66,1.66,5.02,15.1,5.02,8.38,8.38,11.74,	11.74,11.74,11.74,8.38,8.38,5.02,15.1,5.02,1.66,1.66,11.74,11.74,8.38,5.02,8.38,5.02,1.66,	1.66,25.18,15.1,15.1,18.46,18.46,21.82,21.82,25.18,18.46,21.82,25.18,21.82,18.46,25.18
 	};
- 
+
 };
 
 #endif
@@ -161,7 +162,7 @@ void petSysSorter::Init(TTree *tree)
    fChain->SetBranchAddress("z", &z, &b_z);
    fChain->SetBranchAddress("tqT", &tqT, &b_tqT);
    fChain->SetBranchAddress("tqE", &tqE, &b_tqE);
-   
+
    Notify();
 }
 
@@ -172,7 +173,7 @@ Bool_t petSysSorter::Notify()
    // is started when using PROOF. It is normally not necessary to make changes
    // to the generated code, but the routine can be extended by the
    // user if needed. The return value is currently not used.
-   
+
 //   str=fChain->GetCurrentFile()->GetName();
 //	cout << "Reading data from file: " << str << endl;
 
@@ -186,7 +187,7 @@ Bool_t petSysSorter::Notify()
          return kFALSE;
       }
    }
-   
+
    cout << "Port configuration: ";
    for(int i=0;i<7;i++) cout << ports[i] << " ";
    cout << endl;
@@ -209,7 +210,7 @@ Int_t petSysSorter::Cut(Long64_t entry)
 
 //	if(step1==20 && step2==20)   return 1;
 //	else return -1;
-	
+
 	return 1;
 }
 #endif // #ifdef petSysSorter_cxx
