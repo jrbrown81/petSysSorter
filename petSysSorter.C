@@ -614,11 +614,13 @@ void run(TString string, Int_t toProcess=0, Bool_t hitMaps=0)
 
 void Usage()
 {
-   cout << "run('filename',toProcess,hitMaps)" << endl;
-   cout << "Provide 'filename' with extention \n";
-   cout << "Specify number of entries to process (enter 0 for all events).\n";
-   cout << "To save hitMaps of first 100 events set 'hitMaps=1'.\n";
-   cout << "Options 'toProcess' and 'hitMaps' may be omitted." << endl;
+   cout << "--------------------------------------------------------------------" << endl;
+   cout << "\n      run('filename',toProcess,hitMaps)\n" << endl;
+   cout << "   Provide 'filename' with extention. \n";
+   cout << "   Specify number of entries to process (enter 0 for all events).\n";
+   cout << "   To save hitMaps of first 100 events set 'hitMaps=1'.\n";
+   cout << "   Options 'toProcess' and 'hitMaps' may be omitted (defaults 0,0)." << endl;
+   cout << "--------------------------------------------------------------------" << endl;
 }
 void usage()
 {
