@@ -563,12 +563,14 @@ void petSysSorter::Loop(Int_t toProcess=0, Bool_t hitMaps=0)
 //   cout << "Return to normal mode" << endl;
 }
 
-void run(TString string, Int_t toProcess=0, Bool_t hitMaps=0)
+void run(TString filename, Int_t toProcess=0, Bool_t hitMaps=0)
 {
-	TFile f1(string);
+	cout << "Running petSysSorter version " <<fixed<<setprecision(1)<<ver << endl;
+
+	TFile f1(filename);
 	TTree* tree;
 	f1.GetObject("data",tree);
-	if(tree) cout << "data tree found in file: " << string << endl;
+	if(tree) cout << "data tree found in file: " << filename << endl;
 	else cout << "Error!" << endl;
 	petSysSorter pss(tree);
 
@@ -585,6 +587,7 @@ void run(TString string, Int_t toProcess=0, Bool_t hitMaps=0)
 void Usage()
 {
    cout << "--------------------------------------------------------------------" << endl;
+   cout << "--------------------- petSysSorter version " <<fixed<<setprecision(1)<< ver << " ---------------------" << endl;
    cout << "\n      run('filename',toProcess,hitMaps)\n" << endl;
    cout << "   Provide 'filename' with extention. \n";
    cout << "   Specify number of entries to process (enter 0 for all events).\n";

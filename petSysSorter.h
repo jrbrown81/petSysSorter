@@ -17,6 +17,9 @@
 #include <iostream>
 #include <TSystem.h>
 
+
+Float_t ver=2.0;
+
 // Header file for the classes stored in the TTree if any.
 
 class petSysSorter {
